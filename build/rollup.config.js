@@ -21,7 +21,6 @@ import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import externalAlias from './external-alias';
-// import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 
 const { srcDir, outputDir, aliases } = require('./path');
@@ -74,7 +73,6 @@ export default inputs.map(input => {
                 resolve: ['.js', '.tpl'],
                 ...aliases
             }),
-            // resolve(),
             handlebarsPlugin({
                 handlebars: {
                     id: 'handlebars',

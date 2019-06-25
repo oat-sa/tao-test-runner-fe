@@ -66,5 +66,6 @@
     },
     "browserslist": [
         "extends @oat-sa/browserslist-config-tao"
-    ]
+    ],
+    "dependencies": {}
 }

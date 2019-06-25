@@ -6,7 +6,8 @@
       "node" : true
     },
     "globals" : {
-      "ENVIRONMENT" : true
+      "requirejs": true,
+      "define": true
     },
     "plugins" : ["es", "jsdoc"],
     "parserOptions" : {

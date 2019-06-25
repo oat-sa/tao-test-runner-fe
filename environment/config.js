@@ -32,34 +32,17 @@ requirejs.config({
 
         ui: '/node_modules/@oat-sa/tao-core-ui/dist',
         core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
-        lib: '/node_modules/@oat-sa/tao-core-libs/dist',
         jquery: '/node_modules/jquery/jquery',
         lodash: '/node_modules/lodash/lodash',
         moment: '/node_modules/moment/min/moment-with-locales',
         handlebars: '/node_modules/handlebars/dist/handlebars.amd',
 
         /* LIBS */
-        // tpl: '/lib/tpl',
-        // 'jquery.autocomplete': '/node_modules/devbridge-autocomplete/dist/jquery.autocomplete',
-        // 'jquery.mockjax': '/node_modules/jquery-mockjax/dist/jquery.mockjax',
-        // 'jquery.fileDownload': '/lib/jquery.fileDownload',
-        // 'lib/popper/tooltip': '/node_modules/tooltip.js/dist/umd/tooltip',
-        // popper: '/node_modules/popper.js/dist/umd/popper',
-        // select2: '/node_modules/select2/select2',
-        // interact: '/node_modules/interactjs/dist/interact',
         'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
         'lib/moment-timezone.min': '/node_modules/moment-timezone/builds/moment-timezone-with-data.min',
-        // 'lib/gamp/gamp': '/node_modules/gamp/src/gamp',
-        // 'lib/flatpickr': '/node_modules/flatpickr/dist',
-        // 'lib/moo/moo': '/node_modules/moo/moo',
-        // 'lib/decimal/decimal': '/node_modules/decimal.js/decimal',
-        // 'lib/expr-eval/expr-eval': '/node_modules/@oat-sa/expr-eval/dist/bundle',
-        // iframeNotifier: '/lib/iframeNotifier',
-        async: '/node_modules/async/lib/async'
-        // nouislider: '/lib/sliders/jquery.nouislider',
-        // helpers: '/lib/helpers',
-        // lib: '/lib',
+        async: '/node_modules/async/lib/async',
         /* LIBS END */
+        lib: '/node_modules/@oat-sa/tao-core-libs/dist'
     },
     shim: {
         'qunit-parameterize': {

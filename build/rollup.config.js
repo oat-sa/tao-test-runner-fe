@@ -71,7 +71,7 @@ export default inputs.map(input => {
         plugins: [
             externalAlias(['core', 'ui', 'lib']),
             alias({
-                resolve: ['.js', '.json', '.tpl'],
+                resolve: ['.js', '.tpl'],
                 ...aliases
             }),
             // resolve(),

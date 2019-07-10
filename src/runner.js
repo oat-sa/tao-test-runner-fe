@@ -103,8 +103,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
      * @param {...} args - rest parameters given to the provider method
      * @returns {Promise} so provider can do async stuffs
      */
-    function providerRun(method) {
-        var args = [].slice.call(arguments, 1);
+    function providerRun(method, ...args) {
         return new Promise(function(resolve) {
             if (!_.isFunction(provider[method])) {
                 return resolve();
@@ -766,8 +765,8 @@ function testRunnerFactory(providerName, pluginFactories, config) {
     });
 
     runner
-        .on('move', function move(type) {
-            this.trigger.apply(this, [type].concat([].slice.call(arguments, 1)));
+        .on('move', function(...args) {
+            this.trigger(...args);
         })
         .after('destroy', function destroyCleanUp() {
             if (dataHolder) {

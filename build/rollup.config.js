@@ -22,6 +22,7 @@ import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
 import externalAlias from './external-alias';
 import babel from 'rollup-plugin-babel';
+import istanbul from 'rollup-plugin-istanbul';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
@@ -84,6 +85,7 @@ export default inputs.map(input => {
                 // helpers: ['build/tpl.js'],
                 templateExtension: '.tpl'
             }),
+            ...(process.env.COVERAGE ? [istanbul()] : []),
             babel({
                 presets: [
                     [

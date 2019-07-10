@@ -22,6 +22,7 @@ requirejs.config({
         css: '/node_modules/require-css/css',
         text: '/node_modules/requirejs-plugins/lib/text',
         tpl: '/environment/tpl',
+        json: '/node_modules/requirejs-plugins/src/json',
 
         /* TEST related */
         'qunit-parameterize': '/environment/qunit2-parameterize',

@@ -144,6 +144,7 @@ export default function runnerComponentFactory(container = null, config = {}, te
                             .show();
                     });
                 })
+                .on('destroy', () => runner = null )
                 .spread(this, 'error')
                 .init();
         })

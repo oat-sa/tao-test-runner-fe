@@ -47,18 +47,27 @@ define([
     });
 
     QUnit.cases
-        .init([
-            { title: 'init' },
-            { title: 'destroy' },
-            { title: 'show' },
-            { title: 'hide' },
-            { title: 'getOption' },
-            { title: 'getRunner' },
-            { title: 'on' },
-            { title: 'before' },
-            { title: 'after' },
-            { title: 'trigger' }
-        ])
+        .init([{
+            title: 'init'
+        }, {
+            title: 'destroy'
+        }, {
+            title: 'show'
+        }, {
+            title: 'hide'
+        }, {
+            title: 'getOption'
+        }, {
+            title: 'getRunner'
+        }, {
+            title: 'on'
+        }, {
+            title: 'before'
+        }, {
+            title: 'after'
+        }, {
+            title: 'trigger'
+        }])
         .test('API ', (data, assert) => {
             const container = document.getElementById('fixture-module');
 
@@ -87,7 +96,10 @@ define([
         assert.throws(() => runnerComponent(container), /the following properties : providers,options,serviceCallId/);
 
         assert.throws(
-            () => runnerComponent(container, { serviceCallId: 'foo', options: {} }),
+            () => runnerComponent(container, {
+                serviceCallId: 'foo',
+                options: {}
+            }),
             /the following properties : providers,options,serviceCallId/
         );
     });
@@ -170,6 +182,54 @@ define([
             .on('destroy', ready);
     });
 
+    QUnit.test('Get selected providers', assert => {
+        const ready = assert.async();
+        const container = document.getElementById('fixture-init');
+
+        assert.expect(4);
+
+        const testConfig = Object.assign(sampleConfig, {
+            provider: {
+                communicator: 'request'
+            },
+            providers: {
+                runner: {
+                    id: 'mock-runner',
+                    module: 'taoTests/test/runner/mocks/mockRunnerProvider',
+                    category: 'runner'
+                },
+                communicator: {
+                    id: 'request',
+                    module: 'core/communicator/request',
+                    category: 'request'
+                },
+                proxy: [{
+                    id: 'mock-proxy1',
+                    module: 'taoTests/test/runner/mocks/mockProxyProvider',
+                    category: 'proxy'
+                }, {
+                    id: 'mock-proxy2',
+                    module: 'taoTests/test/runner/mocks/mockProxyProvider',
+                    category: 'proxy'
+                }]
+            }
+        });
+
+        runnerComponent(container, testConfig)
+            .on('error', err => assert.ok(false, err.message))
+            .on('ready', function() {
+                const config = this.getRunner().getConfig();
+
+                assert.equal(typeof config.provider, 'object', 'The provider has been generated');
+                assert.equal(config.provider.proxy, 'mock-proxy1', 'The correct proxy provider is selected');
+                assert.equal(config.provider.runner, 'mock-runner', 'The correct runner provider is selected');
+                assert.equal(config.provider.communicator, 'request', 'The communicator provider is kept');
+
+                this.destroy();
+            })
+            .on('destroy', ready);
+    });
+
     QUnit.test('spread error event from test runner', function(assert) {
         const ready = assert.async();
         const container = document.getElementById('fixture-error');
@@ -227,3 +287,4 @@ define([
             });
     });
 });
+

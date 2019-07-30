@@ -133,10 +133,15 @@ export default function runnerComponentFactory(container = null, config = {}, te
         .on('render', function() {
             const runnerConfig = Object.assign(_.omit(this.config, ['providers']), {
                 renderTo: this.getElement()
-            });
-            const runnerProviderId = getSelectedProvider('runner', this.config);
+            }) ;
+            runnerConfig.provider = Object.keys(this.config.providers).reduce( (acc, providerType) => {
+                if (!acc[providerType] && providerType !== 'plugins') {
+                    acc[providerType] = getSelectedProvider(providerType, this.config);
+                }
+                return acc;
+            }, runnerConfig.provider || {});
 
-            runner = runnerFactory(runnerProviderId, plugins, runnerConfig)
+            runner = runnerFactory(runnerConfig.provider.runner, plugins, runnerConfig)
                 .on('ready', () => {
                     _.defer(() => {
                         this.setState('ready')

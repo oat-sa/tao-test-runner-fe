@@ -202,6 +202,15 @@ define([
                     id: 'mock-proxy2',
                     module: 'taoTests/test/runner/mocks/mockProxyProvider',
                     category: 'proxy'
+                }],
+                plugins: [{
+                    id: "fooglin",
+                    module: "taoTests/test/runner/mocks/mockPlugin1",
+                    category: "content"
+                }, {
+                    id: "barglin",
+                    module : "taoTests/test/runner/mocks/mockPlugin2",
+                    category: "tools"
                 }]
             }
         });

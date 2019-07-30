@@ -177,7 +177,7 @@ define([
         const ready = assert.async();
         const container = document.getElementById('fixture-init');
 
-        assert.expect(4);
+        assert.expect(5);
 
         const testConfig = Object.assign(sampleConfig, {
             provider: {
@@ -224,6 +224,7 @@ define([
                 assert.equal(config.provider.proxy, 'mock-proxy1', 'The correct proxy provider is selected');
                 assert.equal(config.provider.runner, 'mock-runner', 'The correct runner provider is selected');
                 assert.equal(config.provider.communicator, 'request', 'The communicator provider is kept');
+                assert.equal(typeof config.provider.plugins, 'undefined', 'Plugins provider is kept');
 
                 this.destroy();
             })

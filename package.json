@@ -14,7 +14,7 @@
         "coverage": "nyc report",
         "coverage:html": "nyc report --reporter=lcov && open-cli coverage/lcov-report/index.html",
         "build": "rollup --config ./build/rollup.config.js",
-        "build:dev" : "NODE_ENV=development npm run build:watch",
+        "build:dev": "NODE_ENV=development npm run build:watch",
         "build:cov": "rollup --config ./build/rollup.config.js --environment COVERAGE",
         "build:watch": "rollup --config ./build/rollup.config.js --watch",
         "lint": "eslint src",

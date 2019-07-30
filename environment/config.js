@@ -16,50 +16,40 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
  */
 
-requirejs.config({
-    baseUrl: '/',
-    paths: {
-        css: '/node_modules/require-css/css',
-        text: '/node_modules/requirejs-plugins/lib/text',
-        tpl: '/environment/tpl',
-        json: '/node_modules/requirejs-plugins/src/json',
+define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function() {
+    requirejs.config({
+        baseUrl: '/',
+        paths: {
+            css: '/node_modules/require-css/css',
+            text: '/node_modules/requirejs-plugins/lib/text',
+            json: '/node_modules/requirejs-plugins/src/json',
 
-        /* TEST related */
-        'qunit-parameterize': '/environment/qunit2-parameterize',
-        qunit: '/node_modules/qunit/qunit',
-        'taoTests/test/runner': '/test',
+            /* TEST related */
+            'qunit-parameterize': '/environment/qunit2-parameterize',
+            qunit: '/node_modules/qunit/qunit',
+            'taoTests/test/runner': '/test',
 
-        'taoTests/runner': '/dist',
+            'taoTests/runner': '/dist',
 
-        ui: '/node_modules/@oat-sa/tao-core-ui/dist',
-        core: '/node_modules/@oat-sa/tao-core-sdk/dist/core',
-        jquery: '/node_modules/jquery/jquery',
-        lodash: '/node_modules/lodash/lodash',
-        moment: '/node_modules/moment/min/moment-with-locales',
-        handlebars: '/node_modules/handlebars/dist/handlebars.amd',
+            ui: '/node_modules/@oat-sa/tao-core-ui/dist',
+            core: '/node_modules/@oat-sa/tao-core-sdk/dist/core'
+        },
+        shim: {
+            'qunit-parameterize': {
+                deps: ['qunit/qunit']
+            }
+        },
+        waitSeconds: 15
+    });
 
-        /* LIBS */
-        'lib/dompurify/purify': '/node_modules/dompurify/dist/purify',
-        'lib/moment-timezone.min': '/node_modules/moment-timezone/builds/moment-timezone-with-data.min',
-        async: '/node_modules/async/lib/async',
-        /* LIBS END */
-        lib: '/node_modules/@oat-sa/tao-core-libs/dist'
-    },
-    shim: {
-        'qunit-parameterize': {
-            deps: ['qunit/qunit']
-        }
-    },
-    waitSeconds: 15
+    define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
+    define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
+        requirejs.config({ nodeIdCompat: true });
+    });
+
+    define('context', ['module'], function(module) {
+        return module.config();
+    });
+
+    define('i18n', [], () => text => text);
 });
-
-define('qunitLibs', ['qunit/qunit', 'css!qunit/qunit.css']);
-define('qunitEnv', ['qunitLibs', 'qunit-parameterize'], function() {
-    requirejs.config({ nodeIdCompat: true });
-});
-
-define('context', ['module'], function(module) {
-    return module.config();
-});
-
-define('i18n', [], () => text => text);

@@ -47,27 +47,18 @@ define([
     });
 
     QUnit.cases
-        .init([{
-            title: 'init'
-        }, {
-            title: 'destroy'
-        }, {
-            title: 'show'
-        }, {
-            title: 'hide'
-        }, {
-            title: 'getOption'
-        }, {
-            title: 'getRunner'
-        }, {
-            title: 'on'
-        }, {
-            title: 'before'
-        }, {
-            title: 'after'
-        }, {
-            title: 'trigger'
-        }])
+        .init([
+            { title: 'init' },
+            { title: 'destroy' },
+            { title: 'show' },
+            { title: 'hide' },
+            { title: 'getOption' },
+            { title: 'getRunner' },
+            { title: 'on' },
+            { title: 'before' },
+            { title: 'after' },
+            { title: 'trigger' }
+        ])
         .test('API ', (data, assert) => {
             const container = document.getElementById('fixture-module');
 

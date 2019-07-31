@@ -16,24 +16,28 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
  */
 
-define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function() {
+define(['/node_modules/@oat-sa/tao-core-libs/dist/pathdefinition.js'], function(libPathDefinition) {
     requirejs.config({
         baseUrl: '/',
-        paths: {
-            css: '/node_modules/require-css/css',
-            text: '/node_modules/requirejs-plugins/lib/text',
-            json: '/node_modules/requirejs-plugins/src/json',
+        paths: Object.assign(
+            {},
+            {
+                css: '/node_modules/require-css/css',
+                text: '/node_modules/requirejs-plugins/lib/text',
+                json: '/node_modules/requirejs-plugins/src/json',
 
-            /* TEST related */
-            'qunit-parameterize': '/environment/qunit2-parameterize',
-            qunit: '/node_modules/qunit/qunit',
-            'taoTests/test/runner': '/test',
+                /* TEST related */
+                'qunit-parameterize': '/environment/qunit2-parameterize',
+                qunit: '/node_modules/qunit/qunit',
+                'taoTests/test/runner': '/test',
 
-            'taoTests/runner': '/dist',
+                'taoTests/runner': '/dist',
 
-            ui: '/node_modules/@oat-sa/tao-core-ui/dist',
-            core: '/node_modules/@oat-sa/tao-core-sdk/dist/core'
-        },
+                ui: '/node_modules/@oat-sa/tao-core-ui/dist',
+                core: '/node_modules/@oat-sa/tao-core-sdk/dist/core'
+            },
+            libPathDefinition
+        ),
         shim: {
             'qunit-parameterize': {
                 deps: ['qunit/qunit']

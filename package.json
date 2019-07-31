@@ -67,6 +67,7 @@
         "open-cli": "^5.0.0",
         "popper.js": "1.15.0",
         "qunit": "^2.9.2",
+        "raphael": "2.1.4",
         "require-css": "^0.1.10",
         "requirejs-plugins": "^1.0.2",
         "rollup": "^1.16.2",

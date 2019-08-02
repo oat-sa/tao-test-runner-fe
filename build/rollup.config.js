@@ -20,9 +20,9 @@ import path from 'path';
 import glob from 'glob';
 import alias from 'rollup-plugin-alias';
 import handlebarsPlugin from 'rollup-plugin-handlebars-plus';
-import externalAlias from './external-alias';
 import babel from 'rollup-plugin-babel';
 import istanbul from 'rollup-plugin-istanbul';
+import wildcardExternal from '@oat-sa/rollup-plugin-wildcard-external';
 
 const { srcDir, outputDir, aliases } = require('./path');
 const Handlebars = require('handlebars');
@@ -75,7 +75,7 @@ export default inputs.map(input => {
         },
         external: [...localExternals, 'lodash', 'context', 'async', 'moment', 'handlebars'],
         plugins: [
-            externalAlias(['core', 'ui', 'lib']),
+            wildcardExternal(['core/**', 'ui/**', 'lib/**']),
             alias({
                 resolve: ['.js', '.tpl'],
                 ...aliases

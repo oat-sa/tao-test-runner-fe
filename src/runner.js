@@ -604,6 +604,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
 
         /**
          * Get the test data/definition
+         * @deprecated
          * @returns {Object} the test data
          */
         getTestData: function getTestData() {
@@ -612,6 +613,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
 
         /**
          * Set the test data/definition
+         * @deprecated
          * @param {Object} testData - the test data
          * @returns {runner} chains
          */

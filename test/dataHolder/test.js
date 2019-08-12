@@ -50,7 +50,7 @@ define(['taoTests/runner/dataHolder'], function(dataHolderFactory) {
         holder = dataHolderFactory();
 
         assert.equal(typeof holder.get('testFoo'), 'undefined', 'testFoo is not a default');
-        assert.equal(typeof holder.get('testData'), 'object', 'testData is a default');
+        assert.equal(typeof holder.get('testData'), 'undefined', 'testData is a NOT default');
         assert.equal(typeof holder.get('testContext'), 'object', 'testContext is a default');
         assert.equal(typeof holder.get('testMap'), 'object', 'testMap is a default');
     });

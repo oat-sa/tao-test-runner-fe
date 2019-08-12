@@ -69,59 +69,62 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
 
     QUnit.cases
         .init([
-            { name: 'init', title: 'init' },
-            { name: 'render', title: 'render' },
-            { name: 'finish', title: 'finish' },
-            { name: 'flush', title: 'flush' },
-            { name: 'destroy', title: 'destroy' },
-            { name: 'loadItem', title: 'loadItem' },
-            { name: 'renderItem', title: 'renderItem' },
-            { name: 'unloadItem', title: 'unloadItem' },
-            { name: 'disableItem', title: 'disableItem' },
-            { name: 'enableItem', title: 'enableItem' },
+            { title: 'init' },
+            { title: 'render' },
+            { title: 'finish' },
+            { title: 'flush' },
+            { title: 'destroy' },
+            { title: 'loadItem' },
+            { title: 'renderItem' },
+            { title: 'unloadItem' },
+            { title: 'disableItem' },
+            { title: 'enableItem' },
 
-            { name: 'getPlugins', title: 'getPlugins' },
-            { name: 'getPlugin', title: 'getPlugin' },
-            { name: 'getConfig', title: 'getConfig' },
-            { name: 'getState', title: 'getState' },
-            { name: 'setState', title: 'setState' },
-            { name: 'getItemState', title: 'getItemState' },
-            { name: 'setItemState', title: 'setItemState' },
-            { name: 'getTestData', title: 'getTestData' },
-            { name: 'getTestContext', title: 'getTestContext' },
-            { name: 'getTestMap', title: 'getTestMap' },
-            { name: 'getAreaBroker', title: 'getAreaBroker' },
-            { name: 'getProxy', title: 'getProxy' },
-            { name: 'getProbeOverseer', title: 'getProbeOverseer' },
-            { name: 'getDataHolder', title: 'getDataHolder' },
+            { title: 'getConfig' },
+            { title: 'getOptions' },
+            { title: 'getPlugins' },
+            { title: 'getPlugin' },
+            { title: 'getPluginsConfig' },
+            { title: 'getPluginConfig' },
+            { title: 'getState' },
+            { title: 'setState' },
+            { title: 'getItemState' },
+            { title: 'setItemState' },
+            { title: 'getTestData' },
+            { title: 'getTestContext' },
+            { title: 'getTestMap' },
+            { title: 'getAreaBroker' },
+            { title: 'getProxy' },
+            { title: 'getProbeOverseer' },
+            { title: 'getDataHolder' },
 
-            { name: 'next', title: 'next' },
-            { name: 'previous', title: 'previous' },
-            { name: 'jump', title: 'jump' },
-            { name: 'skip', title: 'skip' },
-            { name: 'exit', title: 'exit' },
-            { name: 'pause', title: 'pause' },
-            { name: 'resume', title: 'resume' },
-            { name: 'timeout', title: 'timeout' },
+            { title: 'next' },
+            { title: 'previous' },
+            { title: 'jump' },
+            { title: 'skip' },
+            { title: 'exit' },
+            { title: 'pause' },
+            { title: 'resume' },
+            { title: 'timeout' },
 
-            { name: 'trigger', title: 'trigger' },
-            { name: 'before', title: 'before' },
-            { name: 'on', title: 'on' },
-            { name: 'after', title: 'after' }
+            { title: 'trigger' },
+            { title: 'before' },
+            { title: 'on' },
+            { title: 'after' }
         ])
         .test('api', function(data, assert) {
             var runner;
             runnerFactory.registerProvider('mock', mockProvider);
             runner = runnerFactory();
             assert.equal(
-                typeof runner[data.name],
+                typeof runner[data.title],
                 'function',
                 `The runner instance exposes a "${data.title}" function`
             );
         });
 
     QUnit.module('provider', {
-        afterEach: function() {
+        afterEach() {
             runnerFactory.clearProviders();
         }
     });
@@ -145,18 +148,45 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
         runner.init();
     });
 
-    QUnit.test('get config', function(assert) {
-        var ready = assert.async();
-        var config = {
-            moo: 'norz'
+    QUnit.test('get configurations', assert => {
+        const ready = assert.async();
+        const config = {
+            serviceCallId : '123-456-789',
+            provider : {
+                proxy : 'foo',
+                communicator: 'bar'
+            },
+            bootstrap : {
+                serviceUrl : '/foo'
+            },
+            options : {
+                exitUrl : '/bye',
+                fullScreen : false,
+                progress : 'percent',
+                plugins : {
+                    title :  {
+                        section : true
+                    },
+                    connectivity : {
+                        icon : 'net'
+                    }
+                }
+            }
         };
-        assert.expect(1);
+        assert.expect(3);
 
         runnerFactory.registerProvider('foo', {
             loadAreaBroker: _.noop,
-            init: function() {
-                var myConfig = this.getConfig();
-                assert.deepEqual(myConfig, config, 'The retrieved config is the right one');
+            init() {
+                const testRunnerConfig = this.getConfig();
+                assert.deepEqual(testRunnerConfig, config, 'The retrieved config match');
+
+                const testRunnerOptions = this.getOptions();
+                assert.deepEqual(testRunnerOptions, config.options, 'The retrieved options match');
+
+                const pluginsConfig = this.getPluginsConfig();
+                assert.deepEqual(pluginsConfig, config.options.plugins, 'The retrieved plugins config match');
+
                 ready();
             }
         });
@@ -871,7 +901,7 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
     QUnit.test('getDataHolder', function(assert) {
         var dataHolder;
 
-        assert.expect(6);
+        assert.expect(5);
 
         runnerFactory.registerProvider('foo', mockProvider);
 
@@ -880,13 +910,12 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
         assert.equal(typeof dataHolder, 'object', 'The runner exposes the data holder');
         assert.equal(typeof dataHolder.get, 'function', 'The data holder has the get method');
         assert.equal(typeof dataHolder.set, 'function', 'The data holder has the set method');
-        assert.equal(typeof dataHolder.get('testData'), 'object', 'The data holder holds the correct data');
         assert.equal(typeof dataHolder.get('testContext'), 'object', 'The data holder holds the correct data');
         assert.equal(typeof dataHolder.get('testMap'), 'object', 'The data holder holds the correct data');
     });
 
     QUnit.module('plugins', {
-        beforeEach: function() {
+        beforeEach() {
             runnerFactory.clearProviders();
         }
     });
@@ -923,6 +952,64 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
                 assert.equal(typeof this.getPlugin('boo'), 'object', 'The boo plugin exists');
             })
             .init();
+    });
+
+
+    QUnit.test('get plugin config', assert => {
+        const ready = assert.async();
+        const config = {
+            serviceCallId : '123-456-789',
+            provider : {
+                proxy : 'foo'
+            },
+            bootstrap : {
+                serviceUrl : '/foo'
+            },
+            options : {
+                fullScreen : false,
+                plugins : {
+                    boo :  {
+                        section : true,
+                        testPart : false
+                    },
+                    bar : {
+                        icon : 'net',
+                        timeout : 3500
+                    }
+                }
+            }
+        };
+
+        const boo = pluginFactory({
+            name: 'boo',
+            init() {}
+        });
+        const bar = pluginFactory({
+            name: 'bar',
+            init() {}
+        });
+
+        assert.expect(7);
+
+        runnerFactory.registerProvider('foo', {
+            loadAreaBroker: _.noop,
+            init() {
+                assert.equal(typeof this.getPlugin('moo'), 'undefined', 'The moo plugin does not exist');
+                assert.equal(typeof this.getPlugin('boo'), 'object', 'The boo plugin exists');
+                assert.equal(typeof this.getPlugin('bar'), 'object', 'The bar plugin exists');
+
+                assert.deepEqual(this.getPluginsConfig(), config.options.plugins, 'The plugins config is set');
+
+                assert.notOk(this.getPluginConfig('yup'), 'No plugin, no config');
+
+                assert.deepEqual(this.getPluginConfig('boo'), config.options.plugins.boo, 'The plugin config is set');
+
+                assert.deepEqual(this.getPluginConfig('bar'), config.options.plugins.bar, 'The plugin config is set');
+                ready();
+            }
+        });
+
+        runnerFactory('foo', { boo, bar }, config).init();
     });
 
     QUnit.test('persistent state', function(assert) {

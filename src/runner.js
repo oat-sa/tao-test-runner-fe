@@ -402,7 +402,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {Object} the config
          */
         getConfig() {
-            return config;
+            return config || {};
         },
 
         /**
@@ -415,7 +415,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {Object} the configuration options
          */
         getOptions() {
-            return config && config.options;
+            return this.getConfig().options || {};
         },
 
         /**
@@ -445,7 +445,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {Object} the configuration options
          */
         getPluginsConfig() {
-            return config && config.options && config.options.plugins;
+            return this.getOptions().plugins || {};
         },
 
         /**

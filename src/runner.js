@@ -458,8 +458,8 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          */
         getPluginConfig(pluginName) {
             if ( pluginName && plugins[pluginName] ) {
-                const pluginsConfig = this.getPluginsConfig();
-zsh:1: command not found: q
+                const pluginsConfig = this.getPluginsConfig();i
+                if (pluginsConfig[pluginName]) {
                     return pluginsConfig[pluginName];
                 }
             }

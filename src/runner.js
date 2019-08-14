@@ -32,7 +32,7 @@ import dataHolderFactory from 'taoTests/runner/dataHolder';
  * @param {Function[]} pluginFactories
  * @param {Object} config
  * @param {String} config.serviceCallId - the identifier of the test session
- * @param {String} config.testDefition - the identifier of the test
+ * @param {String} config.testDefinition - the identifier of the test
  * @param {String} config.testCompilation - the identifier of the compiled test
  * @param {Object} config.provider - the seleted provider by type (ie. proxy, communicator, etc.)
  * @param {Object} config.options - the test runner configuration options
@@ -459,10 +459,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
         getPluginConfig(pluginName) {
             if ( pluginName && plugins[pluginName] ) {
                 const pluginsConfig = this.getPluginsConfig();
-                return pluginsConfig && pluginsConfig[pluginName];
+zsh:1: command not found: q
+                    return pluginsConfig[pluginName];
+                }
             }
 
-            return false;
+            return {};
         },
 
         /**

@@ -1000,7 +1000,7 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
 
                 assert.deepEqual(this.getPluginsConfig(), config.options.plugins, 'The plugins config is set');
 
-                assert.notOk(this.getPluginConfig('yup'), 'No plugin, no config');
+                assert.deepEqual(this.getPluginConfig('yup'), {},  'No plugin, no config');
 
                 assert.deepEqual(this.getPluginConfig('boo'), config.options.plugins.boo, 'The plugin config is set');
 

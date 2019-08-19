@@ -424,6 +424,8 @@ function proxyFactory(proxyName, config) {
 
         /**
          * Gets the test definition data
+         * @deprecated
+         *
          * @returns {Promise} - Returns a promise. The test definition data will be provided on resolve.
          *                      Any error will be provided if rejected.
          * @fires getTestData

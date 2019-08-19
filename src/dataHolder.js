@@ -30,7 +30,7 @@
 /**
  * @type {String[]} the list of default objects to create
  */
-var defaultObjects = ['testData', 'testContext', 'testMap'];
+const defaultObjects = ['testContext', 'testMap'];
 
 /**
  * Creates a new data holder,

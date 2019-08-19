@@ -31,9 +31,14 @@ import dataHolderFactory from 'taoTests/runner/dataHolder';
  * @param {String} providerName
  * @param {Function[]} pluginFactories
  * @param {Object} config
- * @param {String|DOMElement|JQuery} config.contentContainer - the dom element that is going to holds the test content (item, rubick, etc)
- * @param {Array} [config.plugins] - the list of plugin instances to be initialized and bound to the test runner
- * @returns {runner|_L28.testRunnerFactory.runner}
+ * @param {String} config.serviceCallId - the identifier of the test session
+ * @param {String} config.testDefinition - the identifier of the test
+ * @param {String} config.testCompilation - the identifier of the compiled test
+ * @param {Object} config.provider - the seleted provider by type (ie. proxy, communicator, etc.)
+ * @param {Object} config.options - the test runner configuration options
+ * @param {Object} config.options.plugins - the plugins configuration
+ * @param {jQueryElement} config.renderTo - the dom element that is going to holds the test content (item, rubick, etc)
+ * @returns {runner}
  */
 function testRunnerFactory(providerName, pluginFactories, config) {
     /**
@@ -393,10 +398,31 @@ function testRunnerFactory(providerName, pluginFactories, config) {
         },
 
         /**
+         * Get the whole test runner configuration
+         * @returns {Object} the config
+         */
+        getConfig() {
+            return config || {};
+        },
+
+        /**
+         * Get the options from the configuration parameters, (feature flags, parameter values, etc.)
+         *
+         * Alias to getConfig().options
+         *
+         * In deprecated mode, this is initialized through getTestData (after /init)
+         *
+         * @returns {Object} the configuration options
+         */
+        getOptions() {
+            return this.getConfig().options || {};
+        },
+
+        /**
          * Get the runner pugins
          * @returns {plugin[]} the plugins
          */
-        getPlugins: function getPlugins() {
+        getPlugins() {
             return plugins;
         },
 
@@ -405,16 +431,40 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @param {String} name - the plugin name
          * @returns {plugin} the plugin
          */
-        getPlugin: function getPlugin(name) {
+        getPlugin(name) {
             return plugins[name];
         },
 
         /**
-         * Get the config
-         * @returns {Object} the config
+         * Get the configuration of the plugins
+         *
+         * Alias to getConfig().options.plugins
+         *
+         * In deprecated mode, this is initialized through getTestData (after /init)
+         *
+         * @returns {Object} the configuration options
          */
-        getConfig: function getConfig() {
-            return config;
+        getPluginsConfig() {
+            return this.getOptions().plugins || {};
+        },
+
+        /**
+         * Get the configuration of a given plugin
+         *
+         * In deprecated mode, this is initialized through getTestData (after /init)
+         *
+         * @param {String} pluginName - the name of the plugin
+         * @returns {Object} the configuration options of the plugin
+         */
+        getPluginConfig(pluginName) {
+            if ( pluginName && plugins[pluginName] ) {
+                const pluginsConfig = this.getPluginsConfig();i
+                if (pluginsConfig[pluginName]) {
+                    return pluginsConfig[pluginName];
+                }
+            }
+
+            return {};
         },
 
         /**
@@ -604,6 +654,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
 
         /**
          * Get the test data/definition
+         * @deprecated
          * @returns {Object} the test data
          */
         getTestData: function getTestData() {
@@ -612,6 +663,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
 
         /**
          * Set the test data/definition
+         * @deprecated
          * @param {Object} testData - the test data
          * @returns {runner} chains
          */

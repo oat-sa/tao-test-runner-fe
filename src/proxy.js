@@ -342,7 +342,9 @@ function proxyFactory(proxyName, config) {
                                     }
                                 })
                                 .on('error', function(err) {
-                                    self.trigger('error', err);
+                                    if (this.isOnline()()) {
+                                        self.trigger('error', err);
+                                    }
                                 })
                                 .on('receive', function(response) {
                                     self.setOnline();

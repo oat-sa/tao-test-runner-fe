@@ -458,7 +458,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          */
         getPluginConfig(pluginName) {
             if ( pluginName && plugins[pluginName] ) {
-                const pluginsConfig = this.getPluginsConfig();i
+                const pluginsConfig = this.getPluginsConfig();
                 if (pluginsConfig[pluginName]) {
                     return pluginsConfig[pluginName];
                 }

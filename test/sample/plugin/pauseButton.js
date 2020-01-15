@@ -70,7 +70,7 @@ define([
             this.$button.remove();
         },
         enable : function (){
-            this.$button.removeProp('disabled');
+            this.$button.prop('disabled', false);
         },
         disable : function (){
             this.$button.prop('disabled', true);

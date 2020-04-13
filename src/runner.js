@@ -24,6 +24,8 @@ import _ from 'lodash';
 import eventifier from 'core/eventifier';
 import providerRegistry from 'core/providerRegistry';
 import dataHolderFactory from 'taoTests/runner/dataHolder';
+import timerFactory from 'core/timer';
+import pollingFactory from 'core/polling';
 
 /**
  * Builds an instance of the QTI test runner
@@ -101,6 +103,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
      */
     var testStore;
 
+    let stopwatch;
+    let polling;
+
     /**
      * Run a method of the provider (by delegation)
      *
@@ -142,6 +147,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
      */
     function reportError(err) {
         runner.trigger('error', err);
+
+        stopwatch.stop();
+        polling.stop();
     }
 
     config = config || {};
@@ -184,6 +192,16 @@ function testRunnerFactory(providerName, pluginFactories, config) {
                         .trigger('init');
                 })
                 .catch(reportError);
+
+            stopwatch = timerFactory({
+                autoStart: false,
+            });
+
+            polling = pollingFactory({
+                action: () => this.trigger('testRunnerTick', stopwatch.tick()),
+                interval: 1000,
+                autoStart: false,
+            });
 
             return this;
         },
@@ -253,6 +271,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
             providerRun('renderItem', itemRef, itemData)
                 .then(function() {
                     self.setItemState(itemRef, 'ready', true).trigger('renderitem', itemRef, itemData);
+
+                    stopwatch.start();
+                    polling.start();
                 })
                 .catch(reportError);
             return this;
@@ -292,6 +313,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
                 providerRun('disableItem', itemRef)
                     .then(function() {
                         self.setItemState(itemRef, 'disabled', true).trigger('disableitem', itemRef);
+
+                        stopwatch.stop();
+                        polling.stop();
                     })
                     .catch(reportError);
             }
@@ -312,6 +336,8 @@ function testRunnerFactory(providerName, pluginFactories, config) {
                 providerRun('enableItem', itemRef)
                     .then(function() {
                         self.setItemState(itemRef, 'disabled', false).trigger('enableitem', itemRef);
+                        stopwatch.start();
+                        polling.start();
                     })
                     .catch(reportError);
             }
@@ -494,6 +520,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
 
                 proxy.on('error', function(error) {
                     self.trigger('error', error);
+
+                    stopwatch.stop();
+                    polling.stop();
                 });
 
                 proxy.install(dataHolder);
@@ -729,6 +758,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         next: function next(scope) {
+            stopwatch.stop();
+            polling.stop();
+
             this.trigger('move', 'next', scope);
             return this;
         },
@@ -740,6 +772,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         previous: function previous(scope) {
+            stopwatch.stop();
+            polling.stop();
+
             this.trigger('move', 'previous', scope);
             return this;
         },
@@ -752,6 +787,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         jump: function jump(position, scope) {
+            stopwatch.stop();
+            polling.stop();
+
             this.trigger('move', 'jump', scope, position);
             return this;
         },
@@ -763,6 +801,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         skip: function skip(scope) {
+            stopwatch.stop();
+            polling.stop();
+
             this.trigger('skip', scope);
             return this;
         },
@@ -774,6 +815,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         exit: function exit(why) {
+            stopwatch.stop();
+            polling.stop();
+
             this.trigger('exit', why);
             return this;
         },
@@ -784,6 +828,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         pause: function pause() {
+            stopwatch.stop();
+            polling.stop();
+
             if (!this.getState('pause')) {
                 this.setState('pause', true).trigger('pause');
             }
@@ -811,6 +858,9 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         timeout: function timeout(scope, ref, timer) {
+            stopwatch.stop();
+            polling.stop();
+
             this.trigger('timeout', scope, ref, timer);
             return this;
         }

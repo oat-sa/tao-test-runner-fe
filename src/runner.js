@@ -49,7 +49,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
     /**
      * @type {Map} Contains the test runner data
      */
-    var dataHolder = dataHolderFactory();
+    var dataHolder;
 
     /**
      * @type {Object} the registered plugins
@@ -163,6 +163,14 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          */
         init: function init() {
             var self = this;
+
+            if(!dataHolder) {
+                if (_.isFunction(provider.loadDataHolder)) {
+                    dataHolder = provider.loadDataHolder.call(this);
+                } else {
+                    dataHolder = dataHolderFactory();
+                }
+            }
 
             //instantiate the plugins first
             _.forEach(pluginFactories, function(pluginFactory) {
@@ -496,7 +504,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
                     self.trigger('error', error);
                 });
 
-                proxy.install(dataHolder);
+                proxy.install(this.getDataHolder());
             }
             return proxy;
         },
@@ -719,7 +727,14 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {dataHolder}
          */
         getDataHolder: function getDataHolder() {
-            return dataHolder;
+            if(!dataHolder) {
+                if (_.isFunction(provider.loadDataHolder)) {
+                    dataHolder = provider.loadDataHolder.call(this);
+                } else {
+                    dataHolder = dataHolderFactory();
+                }
+            }
+            return dataHolder ;
         },
 
         /**

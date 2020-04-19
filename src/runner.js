@@ -744,6 +744,11 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         next: function next(scope) {
+            if (_.isFunction(provider.next)) {
+                return providerRun('next', scope);
+            }
+
+            //backward compat
             this.trigger('move', 'next', scope);
             return this;
         },
@@ -755,6 +760,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         previous: function previous(scope) {
+
+            if (_.isFunction(provider.previous)) {
+                return providerRun('previous', scope);
+            }
+
+            //backward compat
             this.trigger('move', 'previous', scope);
             return this;
         },
@@ -767,6 +778,11 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         jump: function jump(position, scope) {
+            if (_.isFunction(provider.jump)) {
+                return providerRun('jump', position, scope);
+            }
+
+            //backward compat
             this.trigger('move', 'jump', scope, position);
             return this;
         },
@@ -778,6 +794,11 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         skip: function skip(scope) {
+            if (_.isFunction(provider.skip)) {
+                return providerRun('skip', scope);
+            }
+
+            //backward compat
             this.trigger('skip', scope);
             return this;
         },
@@ -789,6 +810,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         exit: function exit(why) {
+
+            if (_.isFunction(provider.exit)) {
+                return providerRun('exit', why);
+            }
+
+            //backward compat
             this.trigger('exit', why);
             return this;
         },
@@ -799,6 +826,16 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         pause: function pause() {
+
+            if (_.isFunction(provider.pause)) {
+                if (!this.getState('pause')) {
+                    this.setState('pause', true);
+                    return providerRun('pause');
+                }
+                return Promise.resolve();
+            }
+
+            //backward compat
             if (!this.getState('pause')) {
                 this.setState('pause', true).trigger('pause');
             }
@@ -811,6 +848,15 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         resume: function resume() {
+            if (_.isFunction(provider.resume)) {
+                if (this.getState('pause')) {
+                    this.setState('pause', false);
+                    return providerRun('resume');
+                }
+                return Promise.resolve();
+            }
+
+            //backward compat
             if (this.getState('pause') === true) {
                 this.setState('pause', false).trigger('resume');
             }
@@ -826,6 +872,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          */
         timeout: function timeout(scope, ref, timer) {
+
+            if (_.isFunction(provider.timeout)) {
+                return providerRun('timeout', scope, ref, timer);
+            }
+
+            //backward compat
             this.trigger('timeout', scope, ref, timer);
             return this;
         }

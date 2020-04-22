@@ -13,8 +13,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-2020 (original work) Open Assessment Technologies SA ;
  */
+
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  * @author Sam <sam@taotesting.com>
@@ -32,34 +33,33 @@ import dataHolderFactory from 'taoTests/runner/dataHolder';
  * @param {Function[]} pluginFactories
  * @param {Object} config
  * @param {String} config.serviceCallId - the identifier of the test session
- * @param {String} config.testDefinition - the identifier of the test
- * @param {String} config.testCompilation - the identifier of the compiled test
- * @param {Object} config.provider - the seleted provider by type (ie. proxy, communicator, etc.)
+ * @param {String} [config.testDefinition] - the identifier of the test definition
+ * @param {String} [config.testCompilation] - the identifier of the compiled test
  * @param {Object} config.options - the test runner configuration options
  * @param {Object} config.options.plugins - the plugins configuration
- * @param {jQueryElement} config.renderTo - the dom element that is going to holds the test content (item, rubick, etc)
+ * @param {jQueryElement} [config.renderTo] - the dom element that is going to holds the test content (item, rubick, etc)
  * @returns {runner}
  */
-function testRunnerFactory(providerName, pluginFactories, config) {
+function testRunnerFactory(providerName, pluginFactories = [], config = {}) {
     /**
      * @type {Object} The test runner instance
      */
-    var runner;
+    let runner;
 
     /**
      * @type {Map} Contains the test runner data
      */
-    var dataHolder;
+    let dataHolder;
 
     /**
      * @type {Object} the registered plugins
      */
-    var plugins = {};
+    const plugins = {};
 
     /**
      * @type {Object} the test of the runner
      */
-    var states = {
+    const states = {
         init: false,
         ready: false,
         render: false,
@@ -70,36 +70,36 @@ function testRunnerFactory(providerName, pluginFactories, config) {
     /**
      * @type {Object} keeps the states of the items
      */
-    var itemStates = {};
+    let itemStates = {};
 
     /**
      * The selected test runner provider
      */
-    var provider = testRunnerFactory.getProvider(providerName);
+    const provider = testRunnerFactory.getProvider(providerName);
 
     /**
      * Keep the area broker instance
      * @see taoTests/runner/areaBroker
      */
-    var areaBroker;
+    let areaBroker;
 
     /**
      * Keep the proxy instance
      * @see taoTests/runner/proxy
      */
-    var proxy;
+    let proxy;
 
     /**
      * Keep the instance of the probes overseer
      * @see taoTests/runner/probeOverseer
      */
-    var probeOverseer;
+    let probeOverseer;
 
     /**
      * Keep the instance of a testStore
      * @see taoTests/runner/testStore
      */
-    var testStore;
+    let testStore;
 
     /**
      * Run a method of the provider (by delegation)
@@ -109,7 +109,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
      * @returns {Promise} so provider can do async stuffs
      */
     function providerRun(method, ...args) {
-        return new Promise(function(resolve) {
+        return new Promise( resolve => {
             if (!_.isFunction(provider[method])) {
                 return resolve();
             }
@@ -126,7 +126,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
     function pluginRun(method) {
         var execStack = [];
 
-        _.forEach(runner.getPlugins(), function(plugin) {
+        _.forEach(runner.getPlugins(), plugin => {
             if (_.isFunction(plugin[method])) {
                 execStack.push(plugin[method]());
             }
@@ -144,8 +144,6 @@ function testRunnerFactory(providerName, pluginFactories, config) {
         runner.trigger('error', err);
     }
 
-    config = config || {};
-
     /**
      * Defines the test runner
      *
@@ -161,20 +159,15 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#init
          * @returns {runner} chains
          */
-        init: function init() {
-            var self = this;
+        init() {
 
             if(!dataHolder) {
-                if (_.isFunction(provider.loadDataHolder)) {
-                    dataHolder = provider.loadDataHolder.call(this);
-                } else {
-                    dataHolder = dataHolderFactory();
-                }
+                dataHolder = this.getDataHolder();
             }
 
             //instantiate the plugins first
-            _.forEach(pluginFactories, function(pluginFactory) {
-                var plugin = pluginFactory(runner, self.getAreaBroker());
+            _.forEach(pluginFactories, pluginFactory => {
+                const plugin = pluginFactory(runner, this.getAreaBroker());
                 plugins[plugin.getName()] = plugin;
             });
 
@@ -183,12 +176,10 @@ function testRunnerFactory(providerName, pluginFactories, config) {
                 .then(_.partial(pluginRun, 'install'))
                 .then(_.partial(providerRun, 'init'))
                 .then(_.partial(pluginRun, 'init'))
-                .then(function() {
-                    self.setState('init', true)
+                .then(() => {
+                    this.setState('init', true)
                         .off('init.internal')
-                        .after('init.internal', function initDone() {
-                            this.render();
-                        })
+                        .after('init.internal', () => this.render() )
                         .trigger('init');
                 })
                 .catch(reportError);
@@ -204,18 +195,13 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#ready
          * @returns {runner} chains
          */
-        render: function render() {
-            var self = this;
-
+        render() {
             providerRun('render')
-                .then(function() {
-                    pluginRun('render')
-                        .then(function() {
-                            self.setState('ready', true)
-                                .trigger('render')
-                                .trigger('ready');
-                        })
-                        .catch(reportError);
+                .then(() => pluginRun('render') )
+                .then(() => {
+                    this.setState('ready', true)
+                        .trigger('render')
+                        .trigger('ready');
                 })
                 .catch(reportError);
             return this;
@@ -230,16 +216,15 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#loaditem
          * @returns {runner} chains
          */
-        loadItem: function loadItem(itemRef) {
-            var self = this;
+        loadItem(itemRef) {
 
             providerRun('loadItem', itemRef)
-                .then(function(itemData) {
-                    self.setItemState(itemRef, 'loaded', true)
+                .then( itemData => {
+                    this.setItemState(itemRef, 'loaded', true)
                         .off('loaditem.internal')
-                        .after('loaditem.internal', function loadItemDone() {
-                            this.renderItem(itemRef, itemData);
-                        })
+                        .after('loaditem.internal', () => (
+                            this.renderItem(itemRef, itemData)
+                        ))
                         .trigger('loaditem', itemRef, itemData);
                 })
                 .catch(reportError);
@@ -255,12 +240,11 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#renderitem
          * @returns {runner} chains
          */
-        renderItem: function renderItem(itemRef, itemData) {
-            var self = this;
-
+        renderItem(itemRef, itemData) {
             providerRun('renderItem', itemRef, itemData)
-                .then(function() {
-                    self.setItemState(itemRef, 'ready', true).trigger('renderitem', itemRef, itemData);
+                .then( () => {
+                    this.setItemState(itemRef, 'ready', true)
+                        .trigger('renderitem', itemRef, itemData);
                 })
                 .catch(reportError);
             return this;
@@ -274,13 +258,11 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#unloaditem
          * @returns {runner} chains
          */
-        unloadItem: function unloadItem(itemRef) {
-            var self = this;
-
+        unloadItem(itemRef) {
             providerRun('unloadItem', itemRef)
-                .then(function() {
+                .then(() => {
                     itemStates = _.omit(itemStates, itemRef);
-                    self.trigger('unloaditem', itemRef);
+                    this.trigger('unloaditem', itemRef);
                 })
                 .catch(reportError);
             return this;
@@ -293,13 +275,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#disableitem
          * @returns {runner} chains
          */
-        disableItem: function disableItem(itemRef) {
-            var self = this;
-
+        disableItem(itemRef) {
             if (!this.getItemState(itemRef, 'disabled')) {
                 providerRun('disableItem', itemRef)
-                    .then(function() {
-                        self.setItemState(itemRef, 'disabled', true).trigger('disableitem', itemRef);
+                    .then(() => {
+                        this.setItemState(itemRef, 'disabled', true)
+                            .trigger('disableitem', itemRef);
                     })
                     .catch(reportError);
             }
@@ -313,13 +294,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#disableitem
          * @returns {runner} chains
          */
-        enableItem: function enableItem(itemRef) {
-            var self = this;
-
+        enableItem(itemRef) {
             if (this.getItemState(itemRef, 'disabled')) {
                 providerRun('enableItem', itemRef)
-                    .then(function() {
-                        self.setItemState(itemRef, 'disabled', false).trigger('enableitem', itemRef);
+                    .then( () => {
+                        this.setItemState(itemRef, 'disabled', false)
+                            .trigger('enableitem', itemRef);
                     })
                     .catch(reportError);
             }
@@ -333,16 +313,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#finish
          * @returns {runner} chains
          */
-        finish: function finish() {
-            var self = this;
-
+        finish() {
             providerRun('finish')
-                .then(function() {
-                    pluginRun('finish')
-                        .then(function() {
-                            self.setState('finish', true).trigger('finish');
-                        })
-                        .catch(reportError);
+                .then(() => pluginRun('finish') )
+                .then(() => {
+                    this.setState('finish', true)
+                        .trigger('finish');
                 })
                 .catch(reportError);
             return this;
@@ -355,16 +331,12 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#flush
          * @returns {runner} chains
          */
-        flush: function flush() {
-            var self = this;
-
+        flush() {
             providerRun('flush')
-                .then(function() {
-                    pluginRun('flush')
-                        .then(function() {
-                            self.setState('flush', true).trigger('flush');
-                        })
-                        .catch(reportError);
+                .then( () => pluginRun('flush') )
+                .then( () => {
+                    this.setState('flush', true)
+                        .trigger('flush');
                 })
                 .catch(reportError);
             return this;
@@ -377,29 +349,19 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#destroy
          * @returns {runner} chains
          */
-        destroy: function destroy() {
-            var self = this;
-
+        destroy() {
             providerRun('destroy')
-                .then(function() {
-                    pluginRun('destroy')
-                        .then(function() {
-                            var destroyed;
-
-                            if (proxy) {
-                                destroyed = proxy.destroy();
-                            } else {
-                                destroyed = Promise.resolve();
-                            }
-
-                            return destroyed.then(function() {
-                                self.setTestContext({})
-                                    .setTestMap({})
-                                    .setState('destroy', true)
-                                    .trigger('destroy');
-                            });
-                        })
-                        .catch(reportError);
+                .then( () => pluginRun('destroy') )
+                .then( () => {
+                    if (proxy) {
+                        return proxy.destroy();
+                    }
+                })
+                .then( () =>  {
+                    this.setTestContext({})
+                        .setTestMap({})
+                        .setState('destroy', true)
+                        .trigger('destroy');
                 })
                 .catch(reportError);
             return this;
@@ -480,7 +442,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *
          * @returns {areaBroker} the areaBroker
          */
-        getAreaBroker: function getAreaBroker() {
+        getAreaBroker() {
             if (!areaBroker) {
                 areaBroker = provider.loadAreaBroker.call(this);
             }
@@ -492,17 +454,14 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *
          * @returns {proxy} the proxy
          */
-        getProxy: function getProxy() {
-            var self = this;
+        getProxy() {
             if (!proxy) {
                 if (!_.isFunction(provider.loadProxy)) {
                     throw new Error('The provider does not have a loadProxy method');
                 }
                 proxy = provider.loadProxy.call(this);
 
-                proxy.on('error', function(error) {
-                    self.trigger('error', error);
-                });
+                proxy.on('error', error => this.trigger('error', error));
 
                 proxy.install(this.getDataHolder());
             }
@@ -514,7 +473,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *
          * @returns {probeOverseer} the probe overseer
          */
-        getProbeOverseer: function getProbeOverseer() {
+        getProbeOverseer() {
             if (!probeOverseer && _.isFunction(provider.loadProbeOverseer)) {
                 probeOverseer = provider.loadProbeOverseer.call(this);
             }
@@ -527,7 +486,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *
          * @returns {testStore} the testStore instance
          */
-        getTestStore: function getTestStore() {
+        getTestStore() {
             if (!testStore && _.isFunction(provider.loadTestStore)) {
                 testStore = provider.loadTestStore.call(this);
             }
@@ -541,8 +500,8 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *
          * @returns {Promise<storage>} the plugin store
          */
-        getPluginStore: function getPluginStore(name) {
-            var loadedStore = this.getTestStore();
+        getPluginStore(name) {
+            const loadedStore = this.getTestStore();
             if (!loadedStore || !_.isFunction(loadedStore.getStore)) {
                 return Promise.reject(
                     new Error('Please configure a testStore via loadTestStore to be able to get a plugin store')
@@ -557,7 +516,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @param {String} name - the state name
          * @returns {Boolean} if active, false if not set
          */
-        getState: function getState(name) {
+        getState(name) {
             return !!states[name];
         },
 
@@ -569,7 +528,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @returns {runner} chains
          * @throws {TypeError} if the state name is not a valid string
          */
-        setState: function setState(name, active) {
+        setState(name, active) {
             if (!_.isString(name) || _.isEmpty(name)) {
                 throw new TypeError('The state must have a name');
             }
@@ -585,8 +544,8 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @param {String} name - the state name
          * @returns {Boolean} if active, false if not set
          */
-        getPersistentState: function getPersistentState(name) {
-            var state;
+        getPersistentState(name) {
+            let state;
 
             if (_.isFunction(provider.getPersistentState)) {
                 state = provider.getPersistentState.call(runner, name);
@@ -605,8 +564,8 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *                      - will be resolved once the state is fully stored
          *                      - will be rejected if any error occurs or if the state name is not a valid string
          */
-        setPersistentState: function setPersistentState(name, active) {
-            var stored;
+        setPersistentState(name, active) {
+            let stored;
 
             if (!_.isString(name) || _.isEmpty(name)) {
                 stored = Promise.reject(new TypeError('The state must have a name'));
@@ -628,7 +587,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *
          * @throws {TypeError} if there is no itemRef nor name
          */
-        getItemState: function getItemState(itemRef, name) {
+        getItemState(itemRef, name) {
             if (_.isEmpty(itemRef) || _.isEmpty(name)) {
                 throw new TypeError('The state is identified by an itemRef and a name');
             }
@@ -645,7 +604,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          *
          * @throws {TypeError} if there is no itemRef nor name
          */
-        setItemState: function setItemState(itemRef, name, active) {
+        setItemState(itemRef, name, active) {
             if (_.isEmpty(itemRef) || _.isEmpty(name)) {
                 throw new TypeError('The state is identified by an itemRef and a name');
             }
@@ -665,7 +624,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @deprecated
          * @returns {Object} the test data
          */
-        getTestData: function getTestData() {
+        getTestData() {
             return dataHolder && dataHolder.get('testData');
         },
 
@@ -675,7 +634,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @param {Object} testData - the test data
          * @returns {runner} chains
          */
-        setTestData: function setTestData(testData) {
+        setTestData(testData) {
             if (dataHolder && _.isPlainObject(testData)) {
                 dataHolder.set('testData', testData);
             }
@@ -686,7 +645,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * Get the test context/state
          * @returns {Object} the test context
          */
-        getTestContext: function getTestContext() {
+        getTestContext() {
             return dataHolder && dataHolder.get('testContext');
         },
 
@@ -695,7 +654,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @param {Object} testContext - the context to set
          * @returns {runner} chains
          */
-        setTestContext: function setTestContext(testContext) {
+        setTestContext(testContext) {
             if (dataHolder && _.isPlainObject(testContext)) {
                 dataHolder.set('testContext', testContext);
             }
@@ -706,7 +665,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * Get the test items map
          * @returns {Object} the test map
          */
-        getTestMap: function getTestMap() {
+        getTestMap() {
             return dataHolder && dataHolder.get('testMap');
         },
 
@@ -715,7 +674,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @param {Object} testMap - the map to set
          * @returns {runner} chains
          */
-        setTestMap: function setTestMap(testMap) {
+        setTestMap(testMap) {
             if (dataHolder && _.isPlainObject(testMap)) {
                 dataHolder.set('testMap', testMap);
             }
@@ -726,7 +685,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * Get the data holder
          * @returns {dataHolder}
          */
-        getDataHolder: function getDataHolder() {
+        getDataHolder() {
             if(!dataHolder) {
                 if (_.isFunction(provider.loadDataHolder)) {
                     dataHolder = provider.loadDataHolder.call(this);
@@ -743,7 +702,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#move
          * @returns {runner} chains
          */
-        next: function next(scope) {
+        next(scope) {
             if (_.isFunction(provider.next)) {
                 return providerRun('next', scope);
             }
@@ -759,7 +718,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#move
          * @returns {runner} chains
          */
-        previous: function previous(scope) {
+        previous(scope) {
 
             if (_.isFunction(provider.previous)) {
                 return providerRun('previous', scope);
@@ -777,7 +736,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#move
          * @returns {runner} chains
          */
-        jump: function jump(position, scope) {
+        jump(position, scope) {
             if (_.isFunction(provider.jump)) {
                 return providerRun('jump', position, scope);
             }
@@ -793,7 +752,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#move
          * @returns {runner} chains
          */
-        skip: function skip(scope) {
+        skip(scope) {
             if (_.isFunction(provider.skip)) {
                 return providerRun('skip', scope);
             }
@@ -809,7 +768,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#exit
          * @returns {runner} chains
          */
-        exit: function exit(why) {
+        exit(why) {
 
             if (_.isFunction(provider.exit)) {
                 return providerRun('exit', why);
@@ -825,7 +784,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#pause
          * @returns {runner} chains
          */
-        pause: function pause() {
+        pause() {
 
             if (_.isFunction(provider.pause)) {
                 if (!this.getState('pause')) {
@@ -847,7 +806,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#pause
          * @returns {runner} chains
          */
-        resume: function resume() {
+        resume() {
             if (_.isFunction(provider.resume)) {
                 if (this.getState('pause')) {
                     this.setState('pause', false);
@@ -871,7 +830,7 @@ function testRunnerFactory(providerName, pluginFactories, config) {
          * @fires runner#timeout
          * @returns {runner} chains
          */
-        timeout: function timeout(scope, ref, timer) {
+        timeout(scope, ref, timer) {
 
             if (_.isFunction(provider.timeout)) {
                 return providerRun('timeout', scope, ref, timer);

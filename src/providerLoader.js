@@ -67,6 +67,7 @@ import pluginLoader from 'core/pluginLoader';
 import communicator from 'core/communicator';
 import runner from 'taoTests/runner/runner';
 import proxy from 'taoTests/runner/proxy';
+import itemRunner from 'taoItems/runner/api/itemRunner';
 
 const logger = loggerFactory('taoTests/runner/loader');
 
@@ -115,6 +116,15 @@ export default function loadTestRunnerProviders(providers = {}, loadFromBundle =
     const registration = {
         runner(runnerProviders = []) {
             return loadAndRegisterProvider(runnerProviders, runner);
+        },
+        itemRunner(itemRunnerProviders = []) {
+            return providerLoader()
+                .addList(itemRunnerProviders)
+                .load(loadFromBundle)
+                .then(loadedProviders => {
+                    loadedProviders.forEach(provider => itemRunner.register(provider.name, provider));
+                    return itemRunner;
+                });
         },
         communicator(communicatorProviders = []) {
             return loadAndRegisterProvider(communicatorProviders, communicator);

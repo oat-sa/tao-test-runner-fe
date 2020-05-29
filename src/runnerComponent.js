@@ -132,7 +132,7 @@ export default function runnerComponentFactory(container = null, config = {}, te
         })
         .on('render', function() {
             const runnerConfig = Object.assign(_.omit(this.config, ['providers']), {
-                renderTo: this.getElement()
+                renderTo: this.getElement().get(0)
             }) ;
             runnerConfig.provider = Object.keys(this.config.providers).reduce( (acc, providerType) => {
                 if (!acc[providerType] && providerType !== 'plugins') {

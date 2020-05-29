@@ -576,6 +576,21 @@ function proxyFactory(proxyName, config) {
              * @param {Object} params
              */
             return delegate('telemetry', uri, signal, params);
+        },
+
+        /**
+         * Discard the stored timeout event.
+         *
+         * @returns {Promise} - Returns a promise. The result of the request will be provided on resolve.
+         *                      Any error will be provided if rejected.
+         *
+         * @fires acceptTimeout
+         */
+        acceptTimeout: function acceptTimeout() {
+            /**
+             * @event proxy#acceptTimeout
+             */
+            return delegate('acceptTimeout');
         }
     });
 

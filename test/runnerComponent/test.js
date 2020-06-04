@@ -177,7 +177,7 @@ define([
         const ready = assert.async();
         const container = document.getElementById('fixture-init');
 
-        assert.expect(5);
+        assert.expect(6);
 
         const testConfig = Object.assign(sampleConfig, {
             provider: {
@@ -187,6 +187,11 @@ define([
                 runner: {
                     id: 'mock-runner',
                     module: 'taoTests/test/runner/mocks/mockRunnerProvider',
+                    category: 'runner'
+                },
+                itemRunner: {
+                    id: 'mock-item-runner',
+                    module: 'taoTests/test/runner/mocks/mockItemRunnerProvider',
                     category: 'runner'
                 },
                 communicator: {
@@ -223,6 +228,7 @@ define([
                 assert.equal(typeof config.provider, 'object', 'The provider has been generated');
                 assert.equal(config.provider.proxy, 'mock-proxy1', 'The correct proxy provider is selected');
                 assert.equal(config.provider.runner, 'mock-runner', 'The correct runner provider is selected');
+                assert.equal(config.provider.itemRunner, 'mock-item-runner', 'The correct item runner provider is selected');
                 assert.equal(config.provider.communicator, 'request', 'The communicator provider is kept');
                 assert.equal(typeof config.provider.plugins, 'undefined', 'Plugins provider is kept');
 

@@ -75,7 +75,7 @@ export default inputs.map(input => {
         },
         external: [...localExternals, 'lodash', 'context', 'async', 'moment', 'handlebars'],
         plugins: [
-            wildcardExternal(['core/**', 'ui/**', 'lib/**']),
+            wildcardExternal(['core/**', 'ui/**', 'lib/**', 'taoItems/runner/**']),
             alias({
                 resolve: ['.js', '.tpl'],
                 ...aliases

@@ -707,20 +707,23 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
 
     QUnit.test('skip', function(assert) {
         var ready = assert.async();
-        assert.expect(2);
+        assert.expect(4);
 
         runnerFactory.registerProvider('mock', mockProvider);
 
         runnerFactory('mock')
             .on('ready', function() {
                 assert.ok(true, 'The runner is ready');
-                this.skip('section');
+                this.skip('section', 1, 'jump');
             })
             .on('move', function() {
                 assert.ok(false, 'Skip is not a move');
             })
-            .on('skip', function(scope) {
+            .on('skip', function(scope, ref, direction) {
+                console.log(scope, ref, direction)
                 assert.equal(scope, 'section', 'The scope is correct');
+                assert.equal(ref, 1, 'The ref is correct');
+                assert.equal(direction, 'jump', 'The direction is correct');
                 ready();
             })
             .init();
@@ -937,7 +940,7 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
         { title: 'next', parameters: ['item'] },
         { title: 'previous', parameters: ['section'] },
         { title: 'jump', parameters: [10, 'item'] },
-        { title: 'skip', parameters: ['item'] },
+        { title: 'skip', parameters: ['item', null, 'next'] },
         { title: 'exit', parameters: ['logout'] },
         { title: 'pause', parameters: [] },
         { title: 'resume', parameters: [] , pause : true },

@@ -755,7 +755,6 @@ function testRunnerFactory(providerName, pluginFactories = [], config = {}) {
          * @returns {runner} chains
          */
         skip(scope, ref, direction) {
-            console.log('skiip');
             if (_.isFunction(provider.skip)) {
                 return providerRun('skip', scope, ref, direction);
             }

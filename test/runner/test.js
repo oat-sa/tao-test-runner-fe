@@ -720,7 +720,6 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
                 assert.ok(false, 'Skip is not a move');
             })
             .on('skip', function(scope, ref, direction) {
-                console.log(scope, ref, direction)
                 assert.equal(scope, 'section', 'The scope is correct');
                 assert.equal(ref, 1, 'The ref is correct');
                 assert.equal(direction, 'jump', 'The direction is correct');

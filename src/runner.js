@@ -749,16 +749,18 @@ function testRunnerFactory(providerName, pluginFactories = [], config = {}) {
         /**
          * Skip alias
          * @param {String|*} [scope] - the movement scope
-         * @fires runner#move
+         * @param {String|*} [direction] - next/previous/jump
+         * @param {Number|*} [ref] - the item ref
+         * @fires runner#skip
          * @returns {runner} chains
          */
-        skip(scope) {
+        skip(scope, direction, ref) {
             if (_.isFunction(provider.skip)) {
-                return providerRun('skip', scope);
+                return providerRun('skip', scope, direction, ref);
             }
 
             //backward compat
-            this.trigger('skip', scope);
+            this.trigger('skip', scope, direction, ref);
             return this;
         },
 

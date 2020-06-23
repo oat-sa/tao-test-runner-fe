@@ -707,20 +707,22 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
 
     QUnit.test('skip', function(assert) {
         var ready = assert.async();
-        assert.expect(2);
+        assert.expect(4);
 
         runnerFactory.registerProvider('mock', mockProvider);
 
         runnerFactory('mock')
             .on('ready', function() {
                 assert.ok(true, 'The runner is ready');
-                this.skip('section');
+                this.skip('section', 'jump', 1);
             })
             .on('move', function() {
                 assert.ok(false, 'Skip is not a move');
             })
-            .on('skip', function(scope) {
+            .on('skip', function(scope, direction, ref) {
                 assert.equal(scope, 'section', 'The scope is correct');
+                assert.equal(direction, 'jump', 'The direction is correct');
+                assert.equal(ref, 1, 'The ref is correct');
                 ready();
             })
             .init();
@@ -912,6 +914,52 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
         assert.equal(typeof dataHolder.set, 'function', 'The data holder has the set method');
         assert.equal(typeof dataHolder.get('testContext'), 'object', 'The data holder holds the correct data');
         assert.equal(typeof dataHolder.get('testMap'), 'object', 'The data holder holds the correct data');
+    });
+
+    QUnit.test('load dataholder', function(assert) {
+        const expectedDataHolder = new Map();
+
+        assert.expect(2);
+
+        runnerFactory.registerProvider('foo', {
+            loadAreaBroker: _.noop,
+            init: _.noop,
+            loadDataHolder() {
+                assert.ok(true, 'The loadDataHolder method has been called');
+                return expectedDataHolder;
+            }
+        });
+
+        const dataHolder = runnerFactory('foo').getDataHolder();
+
+        assert.equal(dataHolder, expectedDataHolder, 'The custom data holder has been loaded');
+    });
+
+    QUnit.cases.init([
+        { title: 'next', parameters: ['item'] },
+        { title: 'previous', parameters: ['section'] },
+        { title: 'jump', parameters: [10, 'item'] },
+        { title: 'skip', parameters: ['item', 'next', null] },
+        { title: 'exit', parameters: ['logout'] },
+        { title: 'pause', parameters: [] },
+        { title: 'resume', parameters: [] , pause : true },
+        { title: 'timeout', parameters: ['test', 'test1', { t0 : 50 }] },
+    ]).test('action exposed on provider', function(data, assert) {
+        assert.expect(2);
+        const action = data.title;
+
+        runnerFactory.registerProvider('foo', {
+            loadAreaBroker: _.noop,
+            init: _.noop,
+            [action](...parameters){
+                assert.ok(true, 'the action is called from the provider');
+                assert.deepEqual(parameters, data.parameters, 'Parameters are delegated to the provider');
+            }
+        });
+
+        const runner = runnerFactory('foo').init();
+        runner.setState('pause', data.pause);
+        runner[action](...data.parameters);
     });
 
     QUnit.module('plugins', {

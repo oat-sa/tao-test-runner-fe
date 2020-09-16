@@ -114,6 +114,17 @@ export default function runnerComponentFactory(container = null, config = {}, te
          */
         getRunner() {
             return runner;
+        },
+
+        /**
+         * Set loaded plugins
+         * Should be called before render
+         * @param {Array} loadedPlugins
+         */
+        setLoadedPlugins(loadedPlugins) {
+            if (!plugins.length) {
+                plugins = loadedPlugins;
+            }
         }
     })
         .setTemplate(template)

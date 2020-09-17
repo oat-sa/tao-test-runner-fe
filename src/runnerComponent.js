@@ -119,7 +119,7 @@ export default function runnerComponentFactory(container = null, config = {}, te
         /**
          * Set loaded plugins
          * Should be called before render
-         * @param {Array} loadedPlugins
+         * @param {Array|Object} loadedPlugins
          */
         setLoadedPlugins(loadedPlugins) {
             if (!plugins.length) {

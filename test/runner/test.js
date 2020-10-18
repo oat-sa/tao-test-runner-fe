@@ -102,6 +102,7 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
             { title: 'previous' },
             { title: 'jump' },
             { title: 'skip' },
+            { title: 'submitItem' },
             { title: 'exit' },
             { title: 'pause' },
             { title: 'resume' },
@@ -728,6 +729,24 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
             .init();
     });
 
+    QUnit.test('submitItem', assert => {
+        const ready = assert.async();
+        assert.expect(2);
+
+        runnerFactory.registerProvider('mock', mockProvider);
+
+        runnerFactory('mock')
+            .on('ready', function() {
+                assert.ok(true, 'The runner is ready');
+                this.submitItem('item-2');
+            })
+            .on('submititem', itemIdentifier => {
+                assert.equal(itemIdentifier, 'item-2', 'The itemIdentifier mathes');
+                ready();
+            })
+            .init();
+    });
+
     QUnit.test('timeout', function(assert) {
         var ready = assert.async();
         var expectedScope = 'assessmentSection';
@@ -940,6 +959,7 @@ define(['lodash', 'core/eventifier', 'taoTests/runner/runner', 'taoTests/runner/
         { title: 'previous', parameters: ['section'] },
         { title: 'jump', parameters: [10, 'item'] },
         { title: 'skip', parameters: ['item', 'next', null] },
+        { title: 'submitItem', parameters: ['item-1'] },
         { title: 'exit', parameters: ['logout'] },
         { title: 'pause', parameters: [] },
         { title: 'resume', parameters: [] , pause : true },

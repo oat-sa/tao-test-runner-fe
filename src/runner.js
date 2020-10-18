@@ -765,6 +765,22 @@ function testRunnerFactory(providerName, pluginFactories = [], config = {}) {
         },
 
         /**
+         * Submit and item
+         * @param {string} [itemIdentifier] - the item to submit
+         * @fires runner#submititem
+         * @returns {runner} chains
+         */
+        submitItem(itemIdentifier) {
+            if (_.isFunction(provider.submitItem)) {
+                return providerRun('submitItem', itemIdentifier);
+            }
+
+            //backward compat
+            this.trigger('submititem', itemIdentifier);
+            return this;
+        },
+
+        /**
          * Exit the test
          * @param {String|*} [why] - reason the test is exited
          * @fires runner#exit

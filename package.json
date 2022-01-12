@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-test-runner",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "displayName": "TAO Test Runner",
     "description": "TAO Test Runner API",
     "files": [
@@ -90,6 +90,5 @@
     "browserslist": [
         "extends @oat-sa/browserslist-config-tao"
     ],
-    "prettier": "@oat-sa/prettier-config",
-    "dependencies": {}
+    "prettier": "@oat-sa/prettier-config"
 }

@@ -76,7 +76,7 @@
         "popper.js": "1.15.0",
         "prettier": "^2.4.1",
         "qunit": "^2.17.2",
-        "raphael": "2.2.0",
+        "raphael": "^2.3.0",
         "require-css": "^0.1.10",
         "requirejs-plugins": "^1.0.2",
         "rollup": "^1.32.1",

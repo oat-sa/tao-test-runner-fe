@@ -64,7 +64,7 @@
         "eslint": "^7.32.0",
         "gamp": "0.2.1",
         "glob": "^7.1.6",
-        "handlebars": "1.3.0",
+        "handlebars": "4.7.7",
         "interactjs": "1.2.8",
         "jquery": "1.9.1",
         "lodash": "2.4.1",

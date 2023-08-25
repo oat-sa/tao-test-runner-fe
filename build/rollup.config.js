@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2023 (original work) Open Assessment Technologies SA ;
  */
 
 import path from 'path';
@@ -29,17 +29,13 @@ const Handlebars = require('handlebars');
 
 const isDev = process.env.NODE_ENV === 'development';
 
-const inputs = glob.sync(path.join(srcDir, '**', '*.js'));
+const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
 
 /**
  * Define all modules as external, so rollup won't bundle them together.
  */
 const localExternals = inputs.map(
-    input =>
-        `taoTests/runner/${path
-            .relative(srcDir, input)
-            .replace(/\\/g, '/')
-            .replace(/\.js$/, '')}`
+    input => `taoTests/runner/${path.relative(srcDir, input).replace(/\\/g, '/').replace(/\.js$/, '')}`
 );
 
 export default inputs.map(input => {
@@ -55,11 +51,11 @@ export default inputs.map(input => {
             name
         },
         watch: {
-            clearScreen : false
+            clearScreen: false
         },
         external: [...localExternals, 'lodash', 'context', 'async', 'moment', 'handlebars'],
         plugins: [
-            wildcardExternal(['core/**', 'ui/**', 'lib/**']),
+            wildcardExternal(['core/**', 'ui/**', 'lib/**', 'taoItems/runner/**']),
             alias({
                 resolve: ['.js', '.tpl'],
                 ...aliases

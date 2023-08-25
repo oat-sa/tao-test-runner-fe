@@ -7,6 +7,11 @@
         <script type="text/javascript">
             require(['/environment/config.js'], function() {
                 require(['qunitEnv'], function() {
+                    define('taoItems/runner/api/itemRunner', [], function() {
+                        return {
+                            register() {}
+                        };
+                    });
                     require(['taoTests/test/runner/runnerComponent/test'], function() {
                         // QUnit.config.notrycatch = true;
                         QUnit.config.reorder = false;

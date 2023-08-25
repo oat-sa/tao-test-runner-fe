@@ -29,6 +29,7 @@ const Handlebars = require('handlebars');
 
 const isDev = process.env.NODE_ENV === 'development';
 
+const globPath = p => p.replace(/\\/g, '/');
 const inputs = glob.sync(globPath(path.join(srcDir, '**', '*.js')));
 
 /**

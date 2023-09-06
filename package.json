@@ -55,7 +55,7 @@
         "@oat-sa/tao-core-libs": "oat-sa/tao-core-libs-fe#breaking/TDR-9/handlebars-4-upgrade",
         "@oat-sa/tao-core-sdk": "oat-sa/tao-core-sdk-fe#breaking/TDR-9/handlebars-4-upgrade",
         "@oat-sa/tao-core-ui": "oat-sa/tao-core-ui-fe#breaking/TDR-9/handlebars-4-upgrade",
-        "@oat-sa/tao-item-runner": "^0.8.2",
+        "@oat-sa/tao-item-runner": "oat-sa/tao-core-ui-fe#breaking/TDR-9/handlebars-4-upgrade",
         "@oat-sa/tao-qunit-testrunner": "^2.0.0",
         "async": "0.2.10",
         "dompurify": "^2.4.0",

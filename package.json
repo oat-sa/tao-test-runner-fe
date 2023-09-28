@@ -1,6 +1,6 @@
 {
     "name": "@oat-sa/tao-test-runner",
-    "version": "0.9.1",
+    "version": "0.10.0",
     "displayName": "TAO Test Runner",
     "description": "TAO Test Runner API",
     "files": [

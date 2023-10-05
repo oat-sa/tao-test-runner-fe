@@ -62,11 +62,11 @@ var modes = {
 var selectStoreMode = function selectStoreMode(testId, preselectedBackend) {
     return store
         .getAll(function validate(storeName) {
-            return _.some(legacyPrefixes, function(prefix) {
+            return _.some(legacyPrefixes, function (prefix) {
                 return !_.isEmpty(storeName) && prefix + testId === storeName;
             });
         }, preselectedBackend)
-        .then(function(foundStores) {
+        .then(function (foundStores) {
             if (_.isArray(foundStores) && foundStores.length > 0) {
                 return modes.fragmented;
             }
@@ -94,7 +94,7 @@ export default function testStoreLoader(testId, preselectedBackend) {
      */
     var isStoreModeUnified = function isStoreModeUnified() {
         if (_.isUndefined(testMode)) {
-            return selectStoreMode(testId, preselectedBackend).then(function(result) {
+            return selectStoreMode(testId, preselectedBackend).then(function (result) {
                 if (result && typeof modes[result] !== 'undefined') {
                     testMode = result;
                 } else {
@@ -137,10 +137,10 @@ export default function testStoreLoader(testId, preselectedBackend) {
                 throw new TypeError('A store name must be provided to get the store');
             }
 
-            if (!_.contains(storeNames, storeName)) {
+            if (!storeNames.includes(storeName)) {
                 storeNames.push(storeName);
             }
-            return isStoreModeUnified().then(function(isUnified) {
+            return isStoreModeUnified().then(function (isUnified) {
                 var loadStore;
                 if (isUnified) {
                     loadStore = store(testId, preselectedBackend);
@@ -148,7 +148,7 @@ export default function testStoreLoader(testId, preselectedBackend) {
                     loadStore = store(`${storeName}-${testId}`, preselectedBackend);
                 }
 
-                return loadStore.then(function(loadedStore) {
+                return loadStore.then(function (loadedStore) {
                     var keyPattern = new RegExp(`^${storeName}__`);
                     var storeKey = function storeKey(key) {
                         return isUnified ? `${storeName}__${key}` : key;
@@ -174,10 +174,10 @@ export default function testStoreLoader(testId, preselectedBackend) {
                          */
                         getItems: function getItems() {
                             if (isUnified) {
-                                return loadedStore.getItems().then(function(entries) {
+                                return loadedStore.getItems().then(function (entries) {
                                     return _.transform(
                                         entries,
-                                        function(acc, entry, key) {
+                                        function (acc, entry, key) {
                                             if (keyPattern.test(key)) {
                                                 acc[key.replace(keyPattern, '')] = entry;
                                             }
@@ -219,8 +219,8 @@ export default function testStoreLoader(testId, preselectedBackend) {
                         clear: function clear() {
                             trackChange();
                             if (isUnified) {
-                                return loadedStore.getItems().then(function(entries) {
-                                    _.forEach(entries, function(entry, key) {
+                                return loadedStore.getItems().then(function (entries) {
+                                    _.forEach(entries, function (entry, key) {
                                         if (keyPattern.test(key)) {
                                             loadedStore.removeItem(key);
                                         }
@@ -243,7 +243,7 @@ export default function testStoreLoader(testId, preselectedBackend) {
          * @returns {testStore} chains
          */
         setVolatile: function setVolatile(storeName) {
-            if (!_.contains(volatiles, storeName)) {
+            if (!volatiles.includes(storeName)) {
                 volatiles.push(storeName);
             }
             return this;
@@ -260,7 +260,7 @@ export default function testStoreLoader(testId, preselectedBackend) {
             var shouldClear = false;
             return store
                 .getIdentifier(preselectedBackend)
-                .then(function(savedStoreId) {
+                .then(function (savedStoreId) {
                     if (!_.isEmpty(storeId) && !_.isEmpty(savedStoreId) && savedStoreId !== storeId) {
                         logger.info(
                             `Storage change detected (${savedStoreId} != ${storeId}) => volatiles data wipe out !`
@@ -269,7 +269,7 @@ export default function testStoreLoader(testId, preselectedBackend) {
                     }
                     return shouldClear;
                 })
-                .then(function(clear) {
+                .then(function (clear) {
                     if (clear) {
                         return self.clearVolatileStores();
                     }
@@ -283,13 +283,13 @@ export default function testStoreLoader(testId, preselectedBackend) {
          */
         clearVolatileStores: function clearVolatileStores() {
             var self = this;
-            var clearing = volatiles.map(function(storeName) {
-                return self.getStore(storeName).then(function(storeInstance) {
+            var clearing = volatiles.map(function (storeName) {
+                return self.getStore(storeName).then(function (storeInstance) {
                     return storeInstance.clear();
                 });
             });
 
-            return Promise.all(clearing).then(function(results) {
+            return Promise.all(clearing).then(function (results) {
                 return results && results.length === volatiles.length;
             });
         },
@@ -334,13 +334,13 @@ export default function testStoreLoader(testId, preselectedBackend) {
          */
         remove: function remove() {
             var legacyStoreExp = new RegExp(`-${testId}$`);
-            return isStoreModeUnified().then(function(isUnified) {
+            return isStoreModeUnified().then(function (isUnified) {
                 if (isUnified) {
-                    return store(testId, preselectedBackend).then(function(storeInstance) {
+                    return store(testId, preselectedBackend).then(function (storeInstance) {
                         return storeInstance.removeStore();
                     });
                 }
-                return store.removeAll(function(storeName) {
+                return store.removeAll(function (storeName) {
                     return legacyStoreExp.test(storeName);
                 }, preselectedBackend);
             });

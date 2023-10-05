@@ -74,7 +74,7 @@ export default function probeOverseerFactory(runner) {
         return runner
             .getTestStore()
             .getStore('test-probe')
-            .then(function(newStorage) {
+            .then(function (newStorage) {
                 queueStorage = newStorage;
                 return Promise.resolve(queueStorage);
             });
@@ -114,7 +114,7 @@ export default function probeOverseerFactory(runner) {
             return collectLatencyEvent(probe);
         }
 
-        _.forEach(probe.events, function(eventName) {
+        _.forEach(probe.events, function (eventName) {
             var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
             runner.on(listen, _.partial(probeHandler, eventName));
         });
@@ -167,11 +167,11 @@ export default function probeOverseerFactory(runner) {
             return collectEvent(probe);
         }
 
-        _.forEach(probe.startEvents, function(eventName) {
+        _.forEach(probe.startEvents, function (eventName) {
             var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
             runner.on(listen, _.partial(startHandler, eventName));
         });
-        _.forEach(probe.stopEvents, function(eventName) {
+        _.forEach(probe.stopEvents, function (eventName) {
             var listen = eventName.indexOf('.') > 0 ? eventName : eventName + eventNs;
             runner.on(listen, _.partial(stopHandler, eventName));
         });
@@ -207,7 +207,7 @@ export default function probeOverseerFactory(runner) {
             if (!_.isString(probe.name) || _.isEmpty(probe.name)) {
                 throw new TypeError('A probe must have a name');
             }
-            if (_.where(probes, { name: probe.name }).length > 0) {
+            if (probes.some(val => val.name === probe.name)) {
                 throw new TypeError('A probe with this name is already regsitered');
             }
 
@@ -250,7 +250,7 @@ export default function probeOverseerFactory(runner) {
          * @returns {Promise} with the data in parameterj
          */
         getQueue: function getQueue() {
-            return getStorage().then(function(storage) {
+            return getStorage().then(function (storage) {
                 return storage.getItem('queue');
             });
         },
@@ -268,9 +268,9 @@ export default function probeOverseerFactory(runner) {
          * @param {Object} entry - the time entry
          */
         push: function push(entry) {
-            getStorage().then(function(storage) {
+            getStorage().then(function (storage) {
                 //ensure the queue is pushed to the store consistently and atomically
-                writing = writing.then(function() {
+                writing = writing.then(function () {
                     queue.push(entry);
                     immutableQueue.push(entry);
                     return storage.setItem('queue', queue);
@@ -283,12 +283,12 @@ export default function probeOverseerFactory(runner) {
          * @returns {Promise} with the data in parameter
          */
         flush: function flush() {
-            return new Promise(function(resolve) {
-                getStorage().then(function(storage) {
-                    writing = writing.then(function() {
-                        return storage.getItem('queue').then(function(flushed) {
+            return new Promise(function (resolve) {
+                getStorage().then(function (storage) {
+                    writing = writing.then(function () {
+                        return storage.getItem('queue').then(function (flushed) {
                             queue = [];
-                            return storage.setItem('queue', queue).then(function() {
+                            return storage.setItem('queue', queue).then(function () {
                                 resolve(flushed);
                             });
                         });
@@ -302,8 +302,8 @@ export default function probeOverseerFactory(runner) {
          * @returns {Promise} once started
          */
         start: function start() {
-            return getStorage().then(function(storage) {
-                return storage.getItem('queue').then(function(savedQueue) {
+            return getStorage().then(function (storage) {
+                return storage.getItem('queue').then(function (savedQueue) {
                     if (_.isArray(savedQueue)) {
                         queue = savedQueue;
                         immutableQueue = savedQueue;
@@ -321,7 +321,7 @@ export default function probeOverseerFactory(runner) {
          */
         stop: function stop() {
             started = false;
-            _.forEach(probes, function(probe) {
+            _.forEach(probes, function (probe) {
                 var eventNs = `.probe-${probe.name}`;
                 var removeHandler = function removeHandler(eventName) {
                     runner.off(eventName + eventNs);
@@ -334,7 +334,7 @@ export default function probeOverseerFactory(runner) {
 
             queue = [];
             immutableQueue = [];
-            return getStorage().then(function(storage) {
+            return getStorage().then(function (storage) {
                 return storage.removeItem('queue').then(resetStorage);
             });
         }

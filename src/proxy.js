@@ -86,15 +86,15 @@ function proxyFactory(proxyName, config) {
      */
     function applyMiddlewares(request, response) {
         // wrap each middleware to provide parameters
-        var list = _.map(getMiddlewares(request.command), function(middleware) {
-            return function(next) {
+        var list = _.map(getMiddlewares(request.command), function (middleware) {
+            return function (next) {
                 middleware(request, response, next);
             };
         });
 
         // apply each middleware in series, then resolve or reject the promise
-        return new Promise(function(resolve, reject) {
-            async.series(list, function(err) {
+        return new Promise(function (resolve, reject) {
+            async.series(list, function (err) {
                 // handle implicit error from response descriptor
                 if (!err && 'error' === response.status) {
                     err = response.data;
@@ -120,12 +120,12 @@ function proxyFactory(proxyName, config) {
      */
     function delegate(fnName) {
         var request = { command: fnName, params: _slice.call(arguments, 1) };
-        if (!initialized && !_.contains(['install', 'init'], fnName)) {
+        if (!initialized && !['install', 'init'].includes(fnName)) {
             return Promise.reject(new Error('Proxy is not properly initialized or has been destroyed!'));
         }
         return delegateProxy
             .apply(null, arguments)
-            .then(function(data) {
+            .then(function (data) {
                 // If the delegate call succeed the proxy is initialized.
                 // Place this set here to avoid to wrap the init() into another promise.
                 initialized = true;
@@ -136,7 +136,7 @@ function proxyFactory(proxyName, config) {
                     data: data
                 });
             })
-            .catch(function(data) {
+            .catch(function (data) {
                 // handle failed request
                 return applyMiddlewares(request, {
                     status: 'error',
@@ -161,7 +161,7 @@ function proxyFactory(proxyName, config) {
             var list = middlewares[queue] || [];
             middlewares[queue] = list;
 
-            _.each(arguments, function(cb) {
+            _.each(arguments, function (cb) {
                 if (_.isFunction(cb)) {
                     list.push(cb);
                 }
@@ -211,27 +211,24 @@ function proxyFactory(proxyName, config) {
              * @event proxy#destroy
              * @param {Promise} promise
              */
-            return delegate('destroy').then(function() {
+            return delegate('destroy').then(function () {
                 // The proxy is now destroyed. A call to init() is mandatory to be able to use it again.
                 initialized = false;
 
                 // a communicator has been invoked and...
                 if (communicatorPromise) {
-                    return new Promise(function(resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         function destroyCommunicator() {
-                            communicator
-                                .destroy()
-                                .then(resolve)
-                                .catch(reject);
+                            communicator.destroy().then(resolve).catch(reject);
                         }
 
                         communicatorPromise
                             // ... has been loaded successfully, then destroy it
-                            .then(function() {
+                            .then(function () {
                                 destroyCommunicator();
                             })
                             // ...has failed to be loaded, maybe no need to destroy it
-                            .catch(function() {
+                            .catch(function () {
                                 if (communicator) {
                                     destroyCommunicator();
                                 } else {
@@ -331,28 +328,28 @@ function proxyFactory(proxyName, config) {
                 return Promise.reject(new Error('Proxy is not properly initialized or has been destroyed!'));
             }
             if (!communicatorPromise) {
-                communicatorPromise = new Promise(function(resolve, reject) {
+                communicatorPromise = new Promise(function (resolve, reject) {
                     if (_.isFunction(proxyAdapter.loadCommunicator)) {
                         communicator = proxyAdapter.loadCommunicator.call(self);
                         if (communicator) {
                             communicator
-                                .before('error', function(e, err) {
+                                .before('error', function (e, err) {
                                     if (self.isConnectivityError(err)) {
                                         self.setOffline('communicator');
                                     }
                                 })
-                                .on('error', function(err) {
+                                .on('error', function (err) {
                                     self.trigger('error', err);
                                 })
-                                .on('receive', function(response) {
+                                .on('receive', function (response) {
                                     self.setOnline();
                                     self.trigger('receive', response, 'communicator');
                                 })
                                 .init()
-                                .then(function() {
+                                .then(function () {
                                     return communicator
                                         .open()
-                                        .then(function() {
+                                        .then(function () {
                                             resolve(communicator);
                                         })
                                         .catch(reject);
@@ -386,7 +383,7 @@ function proxyFactory(proxyName, config) {
             }
 
             this.getCommunicator()
-                .then(function(communicatorInstance) {
+                .then(function (communicatorInstance) {
                     communicatorInstance.channel(name, handler);
                 })
                 // just an empty catch to avoid any error to be displayed in the console when the communicator is not enabled
@@ -404,7 +401,7 @@ function proxyFactory(proxyName, config) {
          * @returns {Promise} The delegated provider's method must return a promise
          */
         send: function send(channel, message) {
-            return this.getCommunicator().then(function(communicatorInstance) {
+            return this.getCommunicator().then(function (communicatorInstance) {
                 return communicatorInstance.send(channel, message);
             });
         },
@@ -581,22 +578,22 @@ function proxyFactory(proxyName, config) {
 
     //listen for connectivty changes
     connectivity
-        .on('offline', function() {
+        .on('offline', function () {
             proxy.setOffline('device');
         })
-        .on('online', function() {
+        .on('online', function () {
             proxy.setOnline();
         });
 
     // catch platform messages that come outside of the communicator component, then each is dispatched to the right channel
     proxy
-        .on('message', function(channel, message) {
+        .on('message', function (channel, message) {
             this.trigger(`channel-${channel}`, message);
         })
-        .use(function(request, response, next) {
+        .use(function (request, response, next) {
             if (response.data && response.data.messages) {
                 // receive server messages
-                _.forEach(response.data.messages, function(msg) {
+                _.forEach(response.data.messages, function (msg) {
                     if (msg.channel) {
                         proxy.trigger('message', msg.channel, msg.message);
                     } else {
@@ -607,7 +604,7 @@ function proxyFactory(proxyName, config) {
             next();
         })
         //detect failing request and change the online status
-        .use(function(request, response, next) {
+        .use(function (request, response, next) {
             if (proxy.isConnectivityError(response.data)) {
                 proxy.setOffline('request');
             } else if (response.data && response.data.sent === true) {

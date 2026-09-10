@@ -46,8 +46,8 @@
     },
     "homepage": "https://github.com/oat-sa/tao-test-runner-fe#readme",
     "devDependencies": {
-        "@babel/core": "^7.21.4",
-        "@babel/preset-env": "^7.21.4",
+        "@babel/core": "^7.28.5",
+        "@babel/preset-env": "^7.28.5",
         "@oat-sa/browserslist-config-tao": "^1.0.1",
         "@oat-sa/eslint-config-tao": "^2.0.0",
         "@oat-sa/prettier-config": "^0.1.1",
@@ -87,5 +87,11 @@
     "browserslist": [
         "extends @oat-sa/browserslist-config-tao"
     ],
-    "prettier": "@oat-sa/prettier-config"
+    "prettier": "@oat-sa/prettier-config",
+    "overrides": {
+        "shell-quote": "1.10.0",
+        "rollup-plugin-handlebars-plus": {
+            "handlebars": "~4.7.9"
+        }
+    }
 }
